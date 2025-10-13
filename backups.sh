@@ -18,14 +18,8 @@ create_backup() {
     check_work_dir
     docker-compose down || error_exit "Failed to stop containers"
     
-    log "Backing up configuration files..."
-    cp docker-compose.yml "$backup_path/" || error_exit "Failed to backup docker-compose.yml"
-    
-    log "Backing up application data..."
-    tar -czf "$backup_path/data.tar.gz" -C "$WORK_DIR" data/ || error_exit "Failed to backup data"
-    
-    log "Backing up SSL certificates..."
-    tar -czf "$backup_path/letsencrypt.tar.gz" -C "$WORK_DIR" letsencrypt/ || error_exit "Failed to backup certificates"
+    log "Backing up entire work directory..."
+    tar -czf "$backup_path/backup.tar.gz" -C "$WORK_DIR" . || error_exit "Failed to backup work directory"
     
     log "Creating backup manifest..."
     cat > "$backup_path/manifest.txt" << EOF
@@ -61,18 +55,14 @@ restore_backup() {
     
     log "Restoring backup: $backup_name"
     
-    log "Stopping containers..."
-    check_work_dir
-    docker-compose down || error_exit "Failed to stop containers"
+    if [ -d "$WORK_DIR" ]; then
+        log "Stopping containers..."
+        cd "$WORK_DIR" || error_exit "Failed to change to working directory"
+        docker-compose down 2>/dev/null
+    fi
     
-    log "Restoring configuration files..."
-    cp "$backup_path/docker-compose.yml" "$WORK_DIR/" || error_exit "Failed to restore docker-compose.yml"
-    
-    log "Restoring application data..."
-    tar -xzf "$backup_path/data.tar.gz" -C "$WORK_DIR" || error_exit "Failed to restore data"
-    
-    log "Restoring SSL certificates..."
-    tar -xzf "$backup_path/letsencrypt.tar.gz" -C "$WORK_DIR" || error_exit "Failed to restore certificates"
+    log "Restoring work directory..."
+    tar -xzf "$backup_path/backup.tar.gz" -C "$WORK_DIR" || error_exit "Failed to restore work directory"
     
     log "Starting containers..."
     docker-compose up -d || error_exit "Failed to start containers"

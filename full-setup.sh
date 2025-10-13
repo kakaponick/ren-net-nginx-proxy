@@ -18,7 +18,7 @@ main() {
     ./setup-firewall.sh setup || error_exit "Firewall setup failed"
     
     log "Step 3: Creating initial backup..."
-    ./backup-restore.sh create || error_exit "Initial backup failed"
+    ./backup.sh create || error_exit "Initial backup failed"
     
     log "Step 4: Final status check..."
     ./check-status.sh || error_exit "Status check failed"

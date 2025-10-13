@@ -138,10 +138,14 @@ nginx-proxy-manager/
 ├── setup-proxy-server.sh    # Install script
 ├── check-status.sh          # Status check script
 ├── update-passwords.sh      # Update passwords
-├── backup-restore.sh        # Backup/restore
+├── backup.sh               # Backup/restore
 ├── setup-firewall.sh        # Firewall setup
 ├── docker-compose.yml       # Docker config
 ├── Makefile                 # Convenience commands
+├── common.sh                # Shared functions and config
+├── seed/                    # Batch proxy host import
+│   ├── seed-proxy.sh        # Domain import script
+│   └── domains.txt          # Domain list (domain ip format)
 ├── data/                    # App data
 │   └── mysql/               # MariaDB database
 └── letsencrypt/             # SSL certificates
@@ -155,16 +159,33 @@ sudo ./update-passwords.sh
 ```
 Generates new secure passwords for all services.
 
+### Batch Import Proxy Hosts
+```bash
+# Create sample domains.txt file
+sudo ./seed/seed-proxy.sh
+
+# Edit domains.txt with your domains, then run:
+make seed
+```
+
+**Format (domains.txt):**
+```
+# Format: domain ip
+example1.com 192.168.1.100
+example2.com 192.168.1.101
+www.example1.com 192.168.1.100
+```
+
 ### Backup & Restore
 ```bash
 # Create a backup
-sudo ./backup-restore.sh create
+sudo ./backup.sh create
 
 # List backups
-sudo ./backup-restore.sh list
+sudo ./backup.sh list
 
 # Restore from a backup
-sudo ./backup-restore.sh restore backup-name
+sudo ./backup.sh restore backup-name
 ```
 
 ### Firewall Setup

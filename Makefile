@@ -1,4 +1,4 @@
-.PHONY: install status backup restore update-passwords clean cleanup test help
+.PHONY: install status backup restore update-passwords clean cleanup test help seed logs view-logs restart update fix-db request-ssl
 
 install:
 	@echo "Installing proxy server..."
@@ -10,11 +10,11 @@ status:
 
 backup:
 	@echo "Creating backup..."
-	@sudo ./backup-restore.sh create
+	@sudo ./backup.sh create
 
 restore:
 	@echo "Available backups:"
-	@sudo ./backup-restore.sh list
+	@sudo ./backup.sh list
 	@echo "Usage: make restore BACKUP_NAME=backup-name"
 
 update-passwords:
@@ -56,6 +56,14 @@ fix-db:
 	@echo "Fixing database connection..."
 	@sudo ./fix-database.sh
 
+seed:
+	@echo "Seeding proxy hosts from domains.txt..."
+	@sudo ./import/seed-proxy.sh
+
+request-ssl:
+	@echo "Requesting SSL certificates for hosts without SSL..."
+	@sudo ./import/request-ssl.sh
+
 help:
 	@echo "Available commands:"
 	@echo "  install          - Install proxy server"
@@ -71,4 +79,6 @@ help:
 	@echo "  update           - Update container images"
 	@echo "  test             - Test setup functionality"
 	@echo "  fix-db           - Fix database connection issues"
+	@echo "  seed             - Import proxy hosts from domains.txt"
+	@echo "  request-ssl      - Request SSL certificates for all hosts without SSL"
 	@echo "  help             - Show this help"
