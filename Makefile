@@ -12,10 +12,14 @@ backup:
 	@echo "Creating backup..."
 	@sudo ./backup.sh create
 
+restore-%:
+	@echo "Restoring backup: $*..."
+	@sudo ./backup.sh restore $*
+
 restore:
 	@echo "Available backups:"
 	@sudo ./backup.sh list
-	@echo "Usage: make restore BACKUP_NAME=backup-name"
+	@echo "Usage: make restore-backup-name  OR  make restore BACKUP_NAME=backup-name"
 
 update-passwords:
 	@echo "Updating default passwords..."

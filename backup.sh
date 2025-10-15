@@ -59,12 +59,18 @@ restore_backup() {
         log "Stopping containers..."
         cd "$WORK_DIR" || error_exit "Failed to change to working directory"
         docker-compose down 2>/dev/null
+        
+        log "Cleaning old data..."
+        rm -rf "$WORK_DIR"/*
+    else
+        mkdir -p "$WORK_DIR"
     fi
     
     log "Restoring work directory..."
     tar -xzf "$backup_path/backup.tar.gz" -C "$WORK_DIR" || error_exit "Failed to restore work directory"
     
     log "Starting containers..."
+    cd "$WORK_DIR" || error_exit "Failed to change to working directory"
     docker-compose up -d || error_exit "Failed to start containers"
     
     log "Waiting for containers to start..."
